@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+
+::-webkit-scrollbar{
+  /* width: 5px; */
+  display: none;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.active-dot {
+  animation: pulse 1.5s infinite;
+}

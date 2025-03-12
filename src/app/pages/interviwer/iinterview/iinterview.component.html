@@ -1,0 +1,110 @@
+<div class="flex justify-end gap-2 p-2">
+  <!-- Modal toggle -->
+<button class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button" (click)="showModal()" (click)="initInterviewForm()">
+Schedule Interview
+</button>
+</div>
+<section class="grid grid-cols-1 gap-3">
+  <div
+    class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition duration-300 ease-in-out p-6"
+    *ngFor="let interview of interviews; index as index">
+
+    <!-- Interview Index -->
+    <h5 class="text-2xl md:text-xl font-bold tracking-tight text-gray-400 dark:text-white md:w-1/12">
+      #{{(pageQueryParams.page-1)*pageQueryParams.limit+index+1}}
+    </h5>
+
+    <!-- Interview Details -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-2 md:gap-1 w-full md:w-11/12">
+
+      <!-- Candidate Name -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Candidate</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">{{interview?.candidateName}}</h6>
+      </div>
+
+      <!-- Start Time -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Start Time</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">
+          {{interview?.startTime | date:'short'}}
+        </h6>
+      </div>
+
+      <!-- Time Spent -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Time Spent</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">
+          <span *ngIf="interview?.status !== 'Active'">{{convertMinutesToHrMin(interview?.totalTimeSpent)}}</span>
+          <span *ngIf="interview?.status === 'Active'">{{interview?.startTime | timeDifference}}</span>
+        </h6>
+      </div>
+
+      <!-- Status -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Status</p>
+        <h6 class="flex gap-2 items-center text-normal font-bold tracking-tight text-gray-600 dark:text-white"
+            [ngClass]="{'!text-green-600': interview?.status === 'Completed', '!text-yellow-600': interview?.status === 'Active'}">
+          {{interview?.status}}
+          <span class="border-gray-100 border-3 rounded-full" *ngIf="interview?.status === 'Active'">
+            <div class="w-[8px] h-[8px] bg-green-800 rounded-full active-dot"></div>
+          </span>
+        </h6>
+      </div>
+
+      <!-- Action Links -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">action</p>
+
+        <section class="flex gap-2.5">
+        <a class="text-sm font-bold tracking-tight hover:underline text-blue-600 dark:text-white" [routerLink]="[interviwerRoutConst.CHALLENGE_PAGE.replace('interviewId', interview._id)]">View</a>
+        <a class="text-sm font-bold tracking-tight hover:underline text-gray-600 dark:text-white" data-modal-target="interview-modal" data-modal-toggle="interview-modal" (click)="onEditInterview(interview)">Edit</a>
+        <a class="text-sm font-bold tracking-tight hover:underline text-red-600 dark:text-white" (click)="onDeleteInterview(interview?._id)">Delete</a>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pagination Component -->
+<app-pagination *ngIf="paginationHelper" [pagination]="paginationHelper.getPagination" (changePageOrSize)="onChangePageOrSize($event)"></app-pagination>
+
+
+<!-- Main modal -->
+<div id="interview-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center md:inset-0 max-h-full bg-gray-700 w-dvw h-dvh">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-800">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    {{interviewForm.value._id?'Update':'Schedule'}} Intervier
+                </h3>
+                <button type="button" class="end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" (click)="dismissModal()">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <form class="space-y-4" [formGroup]="interviewForm">
+                  <input type="text" name="_id" id="_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white hidden" formControlName="_id"/>
+
+                    <div>
+                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Candidate name</label>
+                        <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="John Deo" formControlName="candidateName" />
+                    </div>
+
+                    <div class="text-end">
+                      <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" (click)="!interviewForm.value._id ? onSaveNewInterview() : onUpdateInterview()">
+                        {{interviewForm.value._id?'Update Interview':'Schedule'}}
+                      </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

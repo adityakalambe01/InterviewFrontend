@@ -1,0 +1,218 @@
+<h3 class="text-center text-2xl font-bold mb-2 text-gray-700 dark:text-gray-100">
+  Interview Session
+</h3>
+<section class="grid grid-cols-1 gap-3">
+  <div
+    class="flex flex-col md:flex-row gap-4 justify-between items-center bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition duration-300 ease-in-out p-6">
+    <!-- Interview Index -->
+    <h5 class="text-2xl md:text-xl font-bold tracking-tight text-gray-400 dark:text-white md:w-1/12"></h5>
+
+    <!-- Interview Details -->
+    <div class="grid grid-cols-1 gap-2 md:gap-1 w-full md:w-11/12"
+      [ngClass]="{'md:grid-cols-5': interview?.endTime, 'md:grid-cols-4': !interview?.endTime, }">
+      <!-- Candidate Name -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Candidate</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">
+          {{ interview?.candidateName }}
+        </h6>
+      </div>
+
+      <!-- Start Time -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Start Time</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">
+          {{ interview?.startTime | date : "short" }}
+        </h6>
+      </div>
+
+      <!-- End Time -->
+      @if(interview?.endTime){
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">End At</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">
+          {{ interview?.endTime | date : "short" }}
+        </h6>
+      </div>
+      }
+
+      <!-- Time Spent -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Time Spent</p>
+        <h6 class="text-normal font-bold tracking-tight text-gray-600 dark:text-white">
+          <span *ngIf="interview?.status !== 'Active'">{{
+            convertMinutesToHrMin(interview?.totalTimeSpent)
+            }}</span>
+          <span *ngIf="interview?.status === 'Active'">{{
+            interview?.startTime | timeDifference
+            }}</span>
+        </h6>
+      </div>
+
+      <!-- Status -->
+      <div class="grid grid-cols-1 max-md:grid-cols-2">
+        <p class="font-normal text-gray-700 dark:text-gray-400">Status</p>
+        <h6 class="flex gap-2 items-center text-normal font-bold tracking-tight text-gray-600 dark:text-white"
+          [ngClass]="{
+            '!text-green-600': interview?.status === 'Completed',
+            '!text-yellow-600': interview?.status === 'Active'
+          }">
+          {{ interview?.status }}
+          <span class="border-gray-100 border-3 rounded-full" *ngIf="interview?.status === 'Active'">
+            <div class="w-[8px] h-[8px] bg-green-800 rounded-full active-dot"></div>
+          </span>
+        </h6>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mt-4">
+  <div class="flex justify-center gap-4">
+    <button *ngIf="!interview?.startTime"
+      class="text-white bg-blue-600 hover:bg-blue-700 rounded-md py-2 px-4 font-bold tracking-tight transition duration-300 ease-in-out">
+      Start Interview
+    </button>
+    <button *ngIf="!interview?.endTime"
+      class="text-white bg-gray-600 hover:bg-gray-700 rounded-md py-2 px-4 font-bold tracking-tight transition duration-300 ease-in-out"
+      (click)="onEndInterviewSession()">
+      End Interview
+    </button>
+  </div>
+</section>
+
+<section class="flex justify-center">
+  <hr class="my-4 text-gray-700 dark:text-gray-400 w-11/12" />
+</section>
+
+<!-- New Challenge -->
+<section class="flex justify-between gap-2">
+  <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-100">
+    Challenges
+  </h3>
+  <button type="button"
+  [disabled]="interview?.status === 'Completed'"
+    class="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+    (click)="showChallengeModelForm('')">
+    Add Challenge
+  </button>
+</section>
+<section class="grid gap-2 max-md:grid-cols-1 max-lg:grid-cols-1 max-xl:grid-cols-2 max-2xl:grid-cols-2 grid-cols-3">
+  <div
+    class="p-6 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 transition duration-300 ease-in-out"
+    *ngFor="let challenge of challenges">
+    <div class="flex justify-between">
+      <svg class="w-7 h-7 text-gray-500 dark:text-gray-400 mb-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd"
+          d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7Zm-.293 9.293a1 1 0 0 1 0 1.414L9.414 14l1.293 1.293a1 1 0 0 1-1.414 1.414l-2-2a1 1 0 0 1 0-1.414l2-2a1 1 0 0 1 1.414 0Zm2.586 1.414a1 1 0 0 1 1.414-1.414l2 2a1 1 0 0 1 0 1.414l-2 2a1 1 0 0 1-1.414-1.414L14.586 14l-1.293-1.293Z"
+          clip-rule="evenodd" />
+      </svg>
+      <div class="flex items-center gap-2">
+        <p class="mb-3 font-normal text-gray-500 dark:text-gray-400" [ngClass]="{
+          '!text-red-700': challenge?.score === 'Not Attempted',
+          '!text-yellow-500': challenge?.score === 'Partial Solution',
+          '!text-green-500': challenge?.score === 'Completed',
+          '!text-blue-500': challenge?.score === 'Outstanding',
+          '!text-purple-500': challenge?.score === 'Excellent'
+        }">
+        {{ challenge?.score }}
+      </p>
+      <span class="ms-1 relative group inline-block cursor-pointer">
+    <i class="fa-regular fa-circle-stop text-red-700 mb-3 bg-white rounded-full active-dot" *ngIf="challenge.status==='In-Progress'"></i>
+    <span class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10 invisible group-hover:visible px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 group-hover:opacity-100 dark:bg-gray-700">
+      Terminate
+    </span>
+      </span>
+      <!-- <app-menu-drop-down
+  [dropdownMenuIconButton]="challenge._id"
+  [dropdownDots]="'dot'+challenge._id" [menuItems]="menuItems">
+</app-menu-drop-down> -->
+      </div>
+
+    </div>
+
+    <h5 class="mb-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-300 text-wrap truncate">
+      {{ challenge?.title }}
+    </h5>
+
+    <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
+      Status: <span class="ms-1">{{ challenge?.status }}</span>
+      <span *ngIf="challenge.warningsIssued>2" class="text-amber-600 ms-1">({{challenge.warningsIssued}} warning issued)</span>
+    </p>
+
+    <p class="mb-3 font-normal text-gray-500 dark:text-gray-400">
+      Score:
+      <span class="ms-1 relative group inline-block cursor-pointer" *ngFor="let score of challengeEnumScore.options; let i = index" (click)="updateScore(challenge._id, {score: score })">
+         <i class="fa-regular fa-star"
+     [ngClass]="{ 'fa-solid text-yellow-400': i <= challengeEnumScore.options.indexOf(challenge?.score) }"></i>
+        <span
+          class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10 invisible group-hover:visible px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 group-hover:opacity-100 dark:bg-gray-700">
+          {{ score }}
+          <div class="tooltip-arrow" data-popper-arrow></div>
+        </span>
+      </span>
+
+      <!-- Question mark with tooltip -->
+      <span class="relative group ml-2 w-full cursor-pointer text-gray-500 dark:text-gray-400">
+        <i class="fa-regular fa-circle-question"></i>
+        <!-- Question mark icon -->
+
+        <span
+          class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-10 invisible group-hover:visible px-4 py-3 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-xs opacity-0 group-hover:opacity-100 dark:bg-gray-700 w-44">
+          <div *ngFor="let score of challengeEnumScore.options; let i = index">
+            {{ i + 1 }}★ - {{ score }}
+          </div>
+
+          <div class="tooltip-arrow" data-popper-arrow></div>
+        </span>
+      </span>
+    </p>
+
+    <section class="flex justify-between items-center">
+      <a (click)="copyLink(challenge?.link)" class="inline-flex font-medium items-center text-blue-600 hover:underline">
+        Copy Link
+        <svg class="w-3 h-3 ms-2.5 rtl:rotate-[270deg]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+          fill="none" viewBox="0 0 18 18">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M15 11v4.833A1.166 1.166 0 0 1 13.833 17H2.167A1.167 1.167 0 0 1 1 15.833V4.167A1.166 1.166 0 0 1 2.167 3h4.618m4.447-2H17v5.768M9.111 8.889l7.778-7.778" />
+        </svg>
+      </a>
+      <div>
+        <a (click)="
+            challenge?.status === 'Not-Assigned'
+              ? showChallengeModelForm(challenge?._id)
+              : null
+          " class="inline-flex font-medium items-center text-gray-600 hover:underline me-2">
+          Edit
+          <svg class="w-[18px] h-[18px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z" />
+          </svg>
+        </a>
+        <a class="inline-flex font-medium items-center text-red-600 hover:underline me-2" (click)="
+            challenge?.status === 'Not-Assigned'
+              ? onDeleteChallenge(challenge?._id)
+              : null
+          ">
+          Delete
+          <svg class="w-[16px] h-[16px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+          </svg>
+        </a>
+      </div>
+    </section>
+  </div>
+</section>
+
+<app-challenge-modal (onDismiss)="dismissChallengeModal()" [_ids]="{
+    interviewSessionId: interview?._id,
+    challengeSessionId: challengeId
+  }" (onSaveChallenge)="onSubmitChallenge($event)"></app-challenge-modal>
+
+<app-pagination *ngIf="paginationHelper" [pagination]="paginationHelper.getPagination" (changePageOrSize)="changePageOrSize($event)"></app-pagination>
+
+
